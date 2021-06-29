@@ -35,15 +35,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::displayAll()
 {
-    ui->textBrowser->clear();
+    model->clear();
     word w;
+    int t;
+    int count=0;
     QString     no;
     QString 	name;
     QString     sex;
     QString 	age;
     QString 	room;
     QString     phone;
-    ui->textBrowser->insertPlainText("学号\t姓名\t性别\t年龄\t班级\t\t电话\n");
+    model->setHorizontalHeaderLabels({tr("学号"), tr("姓名"), tr("性别"), tr("年龄"), tr("班级"), tr("电话")});
+    /* 自适应所有列，让它布满空间 */
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     no      =   ui->cnoEdit->text();
     name    =   ui->nameEdit->text();
     sex     =   ui->sexComboBox->currentText();
@@ -56,38 +60,44 @@ void MainWindow::displayAll()
     phone   =   ui->phoneEdit->text();
 
     fp=fopen("./words.txt","r+");
-    while(!feof(fp))
+    while(1)
     {
-      fscanf(fp,"%s%s%s%s%s%s",w.no,w.name,w.sex,w.age,w.room,w.phone);
-      fgetc(fp);
-      if(feof(fp)!=0)
+      t= fscanf(fp,"%s%s%s%s%s%s",w.no,w.name,w.sex,w.age,w.room,w.phone);
+      if(t==EOF&&feof(fp)!=0)
           break;
-      ui->textBrowser->insertPlainText(w.no);     ui->textBrowser->insertPlainText("\t");
-      ui->textBrowser->insertPlainText(w.name);   ui->textBrowser->insertPlainText("\t");
-      ui->textBrowser->insertPlainText(w.sex);    ui->textBrowser->insertPlainText("\t");
-      ui->textBrowser->insertPlainText(w.age);    ui->textBrowser->insertPlainText("\t");
-      ui->textBrowser->insertPlainText(w.room);   ui->textBrowser->insertPlainText("  \t");
-      ui->textBrowser->insertPlainText(w.phone);
-      ui->textBrowser->insertPlainText("\n");
-         ui->textBrowser->moveCursor(QTextCursor::End);
+       model->setItem(count,0,new QStandardItem(w.no));
+       model->setItem(count,1,new QStandardItem(w.name));
+       model->setItem(count,2,new QStandardItem(w.sex));
+       model->setItem(count,3,new QStandardItem(w.age));
+       model->setItem(count,4,new QStandardItem(w.room));
+       model->setItem(count,5,new QStandardItem(w.phone));
+       count++;
      }
     fclose(fp);
+    ui->tableView->setModel(model);
+
+    ui->tableView->show();
+
 }
 
 void MainWindow::searchWords()
 {
-        ui->textBrowser->clear();
+        model->clear();
         word w;
+        int t;
+        int count=0;
         FILE *fp2;
-        fp2=fopen("./choice.txt","w");
-        fprintf(fp2,"学号\t姓名\t性别\t年龄\t班级\t\t电话\n");
         QString     no;
         QString 	name;
         QString     sex;
         QString 	age;
         QString 	room;
         QString     phone;
-        ui->textBrowser->insertPlainText("学号\t姓名\t性别\t年龄\t班级\t\t电话\n");
+        fp2=fopen("./choice.txt","w");
+        fprintf(fp2,"学号\t姓名\t性别\t年龄\t班级\t\t电话\n");
+         model->setHorizontalHeaderLabels({tr("学号"), tr("姓名"), tr("性别"), tr("年龄"), tr("班级"), tr("电话")});
+         /* 自适应所有列，让它布满空间 */
+         ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         no      =   ui->cnoEdit->text();
         name    =   ui->nameEdit->text();
         sex     =   ui->sexComboBox->currentText();
@@ -99,11 +109,10 @@ void MainWindow::searchWords()
         room    =   ui->roomEdit->text();
         phone   =   ui->phoneEdit->text();
         fp=fopen("./words.txt","r+");
-      while(!feof(fp))
+      while(1)
         {
-          fscanf(fp,"%s%s%s%s%s%s",w.no,w.name,w.sex,w.age,w.room,w.phone);
-          fgetc(fp);
-          if(feof(fp)!=0)
+          t=fscanf(fp,"%s%s%s%s%s%s",w.no,w.name,w.sex,w.age,w.room,w.phone);
+          if(t==EOF&&feof(fp)!=0)
               break;
           if(
                   ((no.isEmpty()||strcmp(no.toStdString().c_str(),w.no)==0)&&
@@ -116,18 +125,19 @@ void MainWindow::searchWords()
                   (!no.isEmpty()||!name.isEmpty()||!sex.isEmpty()||!age.isEmpty()||!room.isEmpty()||!phone.isEmpty())
               )
           {
-                ui->textBrowser->insertPlainText(w.no);     ui->textBrowser->insertPlainText("\t");
-                ui->textBrowser->insertPlainText(w.name);   ui->textBrowser->insertPlainText("\t");
-                ui->textBrowser->insertPlainText(w.sex);    ui->textBrowser->insertPlainText("\t");
-                ui->textBrowser->insertPlainText(w.age);    ui->textBrowser->insertPlainText("\t");
-                ui->textBrowser->insertPlainText(w.room);   ui->textBrowser->insertPlainText("  \t");
-                ui->textBrowser->insertPlainText(w.phone);
-                ui->textBrowser->insertPlainText("\n");
-                fprintf(fp2,"%s\t%s\t%s\t%s\t%s\t%s\n",w.no,w.name,w.sex,w.age,w.room,w.phone);
-                //qDebug()<<w.no<<w.name<<w.sex<<w.age<<w.room<<w.phone;
-                ui->textBrowser->moveCursor(QTextCursor::End);
+              model->setItem(count,0,new QStandardItem(w.no));
+              model->setItem(count,1,new QStandardItem(w.name));
+              model->setItem(count,2,new QStandardItem(w.sex));
+              model->setItem(count,3,new QStandardItem(w.age));
+              model->setItem(count,4,new QStandardItem(w.room));
+              model->setItem(count,5,new QStandardItem(w.phone));
+             fprintf(fp2,"%s\t%s\t%s\t%s\t%s\t%s\n",w.no,w.name,w.sex,w.age,w.room,w.phone);
+             count++;
          }
        }
         fclose(fp2);
         fclose(fp);
+        ui->tableView->setModel(model);
+
+        ui->tableView->show();
 }

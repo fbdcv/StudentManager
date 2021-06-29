@@ -6,7 +6,7 @@
 #include <QMainWindow>
 #include<QtWidgets>
 
-#define word_no			10
+#define word_no			20
 #define word_name 		16
 #define word_age		4
 #define word_sex		5
@@ -42,5 +42,6 @@ public:
 private:
     Ui::MainWindow *ui;
     FILE* fp;
+    QStandardItemModel* model = new QStandardItemModel; //创建一个标准的条目模型
 };
 #endif // MAINWINDOW_H
